@@ -1,0 +1,1 @@
+export const card1 = "https://ik.imagekit.io/jjyo3gsee/HI-Study/image/Frame%20794.png?updatedAt=1724494989353"
