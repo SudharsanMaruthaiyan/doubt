@@ -10,7 +10,7 @@ import ProgressBar from "@ramonak/react-progress-bar";
 import { Button, ButtonGroup, Grid } from "@mui/material";
 import { useRef } from "react";
 import { useEffect } from "react";
-import Done from "../../done/Done";
+// import Done from "../../done/Done";
 const QuizProgressBar = ({progress})=>{
   return(
     <>
@@ -25,51 +25,40 @@ const QuizProgressBar = ({progress})=>{
   )
 }
 
-const QuizNavigationn = ({ totalQuestions, currentQuestion, onNavigate, onFinish }) => {
-  return(
-    <>
-      <div className="mb-4 mt-8 w-full shadow-2xl rounded-2xl p-8">
-        <div>
-          <h1 className=" font-medium font-[poppins] text-[17px]">Quiz Navigation</h1>
-        </div>
 
-          <div className="grid grid-cols-3 gap-5 my-5">
-            {[...Array(totalQuestions)].map((_, index) => (
-              <div item key={index}>
-                <Button className=""
-                  variant={currentQuestion === index ? "contained" : "outlined"}
-                  onClick={() => onNavigate(index)}
-                >
-                  {index + 1}
-                </Button>
-              </div>
-            ))}
-          </div>
-        <Button className="w-fit py-3 px-10 bg-[#282664] text-white hover:bg-white border-2 hover:text-black hover:border-[#282664] mt-5" variant="contained" fullWidth onClick={onFinish}>Finish</Button>
-
-        {/* <div className=" grid grid-cols-3 gap-5 mt-5">
-          {[...Array(totalQuestions)].map((_, index) => (
-            <Button  className=" bg-gray-400 rounded-lg py-3 font-bold hover:bg-gray-200 hover:opacity-25 transition-colors"
-                key={index} 
-                variant={currentQuestion === index ? "contained" : "outlined"}
-                onClick={() => onNavigate(index)}
-              >
-                {index + 1}
-            </Button>
-          ))}
-        </div>
-          <div className=" flex justify-center">
-          <ButtonGroup  className="w-fit py-3 px-10 bg-[#282664] text-white hover:bg-white border-2 hover:text-black hover:border-[#282664] mt-5" onClick={onFinish}><p className=" font-[poppins] ">Finish</p></ButtonGroup>
-          </div> */}
-      </div>
-    </>
-  )
-}
 
 const QuizDetails = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [progress, setProgress] = useState(0);
   const questionsRef = useRef([]);
+  const [finish, setFinish] = useState(false)
+  const QuizNavigationn = ({ totalQuestions, currentQuestion, onNavigate, onFinish }) => {
+    
+    return(
+      <>
+        <div className="mb-4 mt-8 w-full shadow-2xl rounded-2xl p-8">
+          <div>
+            <h1 className=" font-medium font-[poppins] text-[17px]">Quiz Navigation</h1>
+          </div>
+  
+            <div className="grid grid-cols-3 gap-5 my-5">
+              {[...Array(totalQuestions)].map((_, index) => (
+                <div item key={index}>
+                  <Button className=""
+                    variant={currentQuestion === index ? "contained" : "outlined"}
+                    onClick={() => onNavigate(index)}
+                  >
+                    {index + 1}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          <Button  className="w-fit py-3 px-10 bg-[#282664] text-white hover:bg-white border-2 hover:text-black hover:border-[#282664] mt-5" variant="contained" fullWidth onClick={()=>{setFinish(!finish)}}>Finish</Button>
+  
+        </div>
+      </>
+    )
+  }
 
   useEffect(() => {
     questionsRef.current = questionsRef.current.slice(0, QuizQuestion.length);
@@ -131,24 +120,14 @@ const QuizDetails = () => {
                           />
                         )}
                       </div>
-
-                        // if (question.type === 'multiple-choice'){
-                        //     return <QuizMultipleChoiceQuestion key={index} question={question} onAnswer={handleAnswer}/>
-                        // }
-                        // else if (question.type === 'image'){
-                        //     return <QuizImageQuestion key={index} question={question} onAnswer={handleAnswer}/>
-                        // }
-                        // else{
-                        //     return <p key={index}>Unkonw Quesitons Type</p>
-                        // }
                     ))
                   }
               </div>
               <div>
                   <div className=" flex justify-end p-8">
-                      <button onClick={()=>{
+                      <button className={`font-[poppins] font-bold  ${finish?'block' : 'hidden'}`} onClick={()=>{
                           setOpen(!open)
-                      }} className=" font-[poppins] font-bold ">Answer</button>
+                      }}>Answer</button>
                   </div>
                   <div className={` transition  ${open? 'block transition' : ' hidden'}`}>
                       <h1 className="bg-[#1176F0]  text-white pl-8 py-3 font-bold font-[poppins]">Solution</h1>
@@ -189,7 +168,7 @@ const QuizDetails = () => {
         <div className='grid grid-cols-1 lg:grid-cols-4 gap-8'>
           <div className="lg:order-1 order-2 col-span-4 lg:col-span-1 ">
               <div className=" sticky top-12 ">
-                 <QuizProgressBar progress={progress}/>
+                <QuizProgressBar progress={progress}/>
               </div>
               <div className=" flex justify-center sticky top-48">
                 <QuizNavigationn 
