@@ -7,8 +7,10 @@ import QuizImageQuestion from "../QuizImageQuestion/QuizImageQuestion";
 import { QuizQuestion } from "../../../assets/Api/QuizQuestion";
 import { useState } from "react";
 import ProgressBar from "@ramonak/react-progress-bar";
-import { ButtonGroup } from "@mui/material";
-
+import { Button, ButtonGroup, Grid } from "@mui/material";
+import { useRef } from "react";
+import { useEffect } from "react";
+import Done from "../../done/Done";
 const QuizProgressBar = ({progress})=>{
   return(
     <>
@@ -30,20 +32,35 @@ const QuizNavigationn = ({ totalQuestions, currentQuestion, onNavigate, onFinish
         <div>
           <h1 className=" font-medium font-[poppins] text-[17px]">Quiz Navigation</h1>
         </div>
-        <div className=" grid grid-cols-3 gap-5 mt-5">
+
+          <div className="grid grid-cols-3 gap-5 my-5">
+            {[...Array(totalQuestions)].map((_, index) => (
+              <div item key={index}>
+                <Button className=""
+                  variant={currentQuestion === index ? "contained" : "outlined"}
+                  onClick={() => onNavigate(index)}
+                >
+                  {index + 1}
+                </Button>
+              </div>
+            ))}
+          </div>
+        <Button className="w-fit py-3 px-10 bg-[#282664] text-white hover:bg-white border-2 hover:text-black hover:border-[#282664] mt-5" variant="contained" fullWidth onClick={onFinish}>Finish</Button>
+
+        {/* <div className=" grid grid-cols-3 gap-5 mt-5">
           {[...Array(totalQuestions)].map((_, index) => (
-            <button  className=" bg-gray-400 rounded-lg py-3 font-bold hover:bg-gray-200 hover:opacity-25 transition-colors"
+            <Button  className=" bg-gray-400 rounded-lg py-3 font-bold hover:bg-gray-200 hover:opacity-25 transition-colors"
                 key={index} 
-                variant={currentQuestion === index ? "default" : "outline"}
+                variant={currentQuestion === index ? "contained" : "outlined"}
                 onClick={() => onNavigate(index)}
               >
                 {index + 1}
-            </button>
+            </Button>
           ))}
         </div>
           <div className=" flex justify-center">
           <ButtonGroup  className="w-fit py-3 px-10 bg-[#282664] text-white hover:bg-white border-2 hover:text-black hover:border-[#282664] mt-5" onClick={onFinish}><p className=" font-[poppins] ">Finish</p></ButtonGroup>
-          </div>
+          </div> */}
       </div>
     </>
   )
@@ -52,6 +69,11 @@ const QuizNavigationn = ({ totalQuestions, currentQuestion, onNavigate, onFinish
 const QuizDetails = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [progress, setProgress] = useState(0);
+  const questionsRef = useRef([]);
+
+  useEffect(() => {
+    questionsRef.current = questionsRef.current.slice(0, QuizQuestion.length);
+  }, []);
 
   const handleAnswer = (answer) => {
     // Here you would typically check if the answer is correct
@@ -59,16 +81,27 @@ const QuizDetails = () => {
 
     // Increase progress by 10%
     setProgress(prev => Math.min(prev + 20, 100));
+    // setProgress(prev => Math.min(prev + (100 / QuizQuestion.length), 100));
 
     // Move to next question
-    if (currentQuestion < QuizQuestion.length - 1) {
-      setCurrentQuestion(prev => prev + 1);
+    if (currentQuestion < QuizQuestion.length - 0) {
+      setCurrentQuestion(prev => prev +1);
+      scrollToQuestion(currentQuestion + 1);
     }
   };
 
-  const handleNavigate = (QuizQuestion) => {
+  const handleNavigate = (questionIndex) => {
     setCurrentQuestion(questionIndex);
+    scrollToQuestion(questionIndex);
   };
+
+  const scrollToQuestion = (questionIndex) => {
+    questionsRef.current[questionIndex]?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
+
 
   const handleFinish = () => {
     // Implement quiz finish logic here
@@ -82,19 +115,33 @@ const QuizDetails = () => {
       <div className=" shadow-2xl mt-12 rounded-xl"> 
           <div className=" rounded-2xl  shadow-2xl">
               <h1 className=" font-bold font-[poppins] border-b-2 p-5 pl-8">Quiz</h1>
-              <div>
+              <div >
                   {
-                    QuizQuestion.map((question, index)=>{
-                        if (question.type === 'multiple-choice'){
-                            return <QuizMultipleChoiceQuestion key={index} question={question} onAnswer={handleAnswer}/>
-                        }
-                        else if (question.type === 'image'){
-                            return <QuizImageQuestion key={index} question={question} onAnswer={handleAnswer}/>
-                        }
-                        else{
-                            return <p key={index}>Unkonw Quesitons Type</p>
-                        }
-                    })
+                    QuizQuestion.map((question, index)=>(
+                      <div key={index} ref={el => questionsRef.current[index] = el}>
+                        {question.type === 'multiple-choice' ? (
+                          <QuizMultipleChoiceQuestion
+                          key={index} question={question} onAnswer={handleAnswer}
+                            questionNumber={index + 1}
+                          />
+                        ) : (
+                          <QuizImageQuestion
+                          key={index} question={question} onAnswer={handleAnswer}
+                            questionNumber={index + 1}
+                          />
+                        )}
+                      </div>
+
+                        // if (question.type === 'multiple-choice'){
+                        //     return <QuizMultipleChoiceQuestion key={index} question={question} onAnswer={handleAnswer}/>
+                        // }
+                        // else if (question.type === 'image'){
+                        //     return <QuizImageQuestion key={index} question={question} onAnswer={handleAnswer}/>
+                        // }
+                        // else{
+                        //     return <p key={index}>Unkonw Quesitons Type</p>
+                        // }
+                    ))
                   }
               </div>
               <div>
@@ -138,11 +185,13 @@ const QuizDetails = () => {
 
   return (
     <div className=' max-w-[100%}'>
-      <div className=' w-[90%] mx-auto py-12'>
+      <div className=' w-[90%] mx-auto py-12 relative'>
         <div className='grid grid-cols-1 lg:grid-cols-4 gap-8'>
-          <div className="lg:order-1 order-2 col-span-4 lg:col-span-1">
-              <QuizProgressBar progress={progress} />
-              <div className=" flex justify-center">
+          <div className="lg:order-1 order-2 col-span-4 lg:col-span-1 ">
+              <div className=" sticky top-12 ">
+                 <QuizProgressBar progress={progress}/>
+              </div>
+              <div className=" flex justify-center sticky top-48">
                 <QuizNavigationn 
                   totalQuestions={QuizQuestion.length}
                   currentQuestion={currentQuestion}

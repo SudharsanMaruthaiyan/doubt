@@ -14,14 +14,14 @@ const QuizMultipleChoiceQuestion = ({question , onAnswer}) => {
                 <div className="  p-5 rounded-b-lg shadow-lg pt-10">
                     <p className=" font-[poppins] text-[#5C6185] pb-5">Select one:</p>
                     <ul>
-                        {question.options.map((option, index) => (
-                            <RadioGroup onChange={onAnswer}>
+                        <RadioGroup onChange={onAnswer}>
+                            {question.options.map((option, index) => (
                                 <div key={index} className=" flex items-center gap-5">
-                                    <FormControlLabel value={index} name="1" control={<Radio/>} label={option} className=" pb-3 font-[poppins] text-[15px] text-[#5C6185]"/>
+                                    <FormControlLabel key={index} value={option}  label={option} control={<Radio/>} className=" pb-3 font-[poppins] text-[15px] text-[#5C6185]"/>
                                     <li></li>
                                 </div>
-                            </RadioGroup>
-                        ))}
+                            ))}
+                        </RadioGroup>
                     </ul>
                 </div>
             </div>
