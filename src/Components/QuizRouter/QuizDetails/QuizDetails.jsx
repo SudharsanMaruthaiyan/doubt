@@ -10,7 +10,6 @@ import ProgressBar from "@ramonak/react-progress-bar";
 import { Button, ButtonGroup, Grid } from "@mui/material";
 import { useRef } from "react";
 import { useEffect } from "react";
-// import Done from "../../done/Done";
 const QuizProgressBar = ({progress})=>{
   return(
     <>
@@ -25,11 +24,10 @@ const QuizProgressBar = ({progress})=>{
   )
 }
 
-
-
 const QuizDetails = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [answeredQuestions, setAnsweredQuestions] = useState({});
   const questionsRef = useRef([]);
   const [finish, setFinish] = useState(false)
   const QuizNavigationn = ({ totalQuestions, currentQuestion, onNavigate, onFinish }) => {
@@ -64,16 +62,20 @@ const QuizDetails = () => {
     questionsRef.current = questionsRef.current.slice(0, QuizQuestion.length);
   }, []);
 
-  const handleAnswer = (answer) => {
+  const handleAnswer = (questionId) => {
     // Here you would typically check if the answer is correct
     // and update the score accordingly
-
+    if (!answeredQuestions[questionId]) {
+      setAnsweredQuestions(prev => ({ ...prev, [questionId]: true }));
+      setProgress(prev => Math.min(prev + 20, 100));
+    }
+    
     // Increase progress by 10%
-    setProgress(prev => Math.min(prev + 20, 100));
+    // setProgress(prev => Math.min(prev + 20, 100));
     // setProgress(prev => Math.min(prev + (100 / QuizQuestion.length), 100));
 
     // Move to next question
-    if (currentQuestion < QuizQuestion.length - 0) {
+    if (currentQuestion < QuizQuestion.length - 1) {
       setCurrentQuestion(prev => prev +1);
       scrollToQuestion(currentQuestion + 1);
     }
@@ -111,7 +113,7 @@ const QuizDetails = () => {
                         {question.type === 'multiple-choice' ? (
                           <QuizMultipleChoiceQuestion
                           key={index} question={question} onAnswer={handleAnswer}
-                            questionNumber={index + 1}
+                            questionNumber={index + 1} 
                           />
                         ) : (
                           <QuizImageQuestion
